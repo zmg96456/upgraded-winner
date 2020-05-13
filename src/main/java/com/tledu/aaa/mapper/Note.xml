@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tledu.aaa.dao.INoteDao">
+	<select id="load" parameterType="int" resultMap="noteMap">
+	select * from t_mynote tm inner join t_user tu on tm.user_id=tu.id where tm.id=#{id}
+	</select>
+	
+	<select id="list"  resultMap="noteMap">
+		select * from t_mynote tm inner join t_user tu on tm.user_id=tu.id order by tm.id desc
+	</select>
+	
+	<select id="find" resultMap="noteMap" parameterType="map">
+		select * from t_mynote tm inner join t_user tu on tm.user_id=tu.id where tm.title like #{search}
+or tm.content like #{search}  or  tu.name like #{search}  
+order by tm.id asc limit #{pageOffset},#{limit}
+	</select>
+	
+		<select id="find_count" resultType="int" parameterType="String">
+		select count(*) from t_mynote tm inner join t_user tu on tm.user_id=tu.id where tm.title like #{search}
+or tm.content like #{search}  or  tu.name like #{search}  
+	</select>
+	
+	<resultMap type="Note" id="noteMap" autoMapping="true">
+		<id column="id" property="id" />
+		<association property="user" column="user_id" javaType="User"
+			resultMap="userMap"></association>	
+	</resultMap>
+
+	<resultMap type="User" id="userMap" autoMapping="true">
+		<id property="id" column="user_id" />
+	</resultMap>
+	
+	
+	
+	<insert id="add" parameterType="Note">
+	insert into t_mynote ( title, content, user_id) 
+	values(#{title},#{content},#{user.id})
+	</insert>
+	
+	<update id="update" parameterType="Note">
+	update t_mynote set title=#{title},
+	content=#{content} where id =#{id}
+
+	</update>
+	
+		<update id="edit" parameterType="Note">
+	update t_mynote set title=#{title},
+	content=#{content} where id =#{id}
+
+	</update>
+	
+	<delete id="delete"  parameterType="int">
+	delete from t_mynote where id = #{id}
+	</delete>
+	
+	
+</mapper>

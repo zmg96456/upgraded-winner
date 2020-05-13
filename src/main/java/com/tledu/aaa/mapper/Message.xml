@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tledu.aaa.dao.IMessageDao">
+	<select id="load" parameterType="int" resultMap="messageMap">
+		select * from t_message tm inner join t_user tu on tm.user_id = tu.id
+		inner join t_messagetype tmt on tm.messageType_id = tmt.id where tm.id = #{id}
+	</select>
+	
+	<select id="list"  resultMap="messageMap">
+		select * from t_message tm inner join t_user tu on tm.user_id = tu.id
+		inner join t_messagetype tmt on tm.messageType_id = tmt.id
+	</select>
+	
+	<select id="find" resultMap="messageMap" parameterType="map">
+		select * from t_message tm inner join t_user tu on tm.user_id = tu.id
+		inner join t_messagetype tmt on tm.messageType_id = tmt.id where tm.title like #{search}
+or tm.content like #{search}  or  tu.name like #{search}  or  tmt.type like #{search}
+order by tm.id desc limit #{pageOffset},#{limit}
+	</select>
+	
+		<select id="find_count" resultType="int" parameterType="String">
+		select count(*) from t_message tm inner join t_user tu on tm.user_id = tu.id
+		inner join t_messagetype tmt on tm.messageType_id = tmt.id where tm.title like #{search}
+or tm.content like #{search}  or  tu.name like #{search}  or  tmt.type like #{search}
+	</select>
+	
+	<resultMap type="Message" id="messageMap" autoMapping="true">
+		<id column="id" property="id" />
+		<association property="user" column="user_id" javaType="User"
+			resultMap="userMap"></association>
+		<association property="messageType" column="messageType_id"
+			javaType="MessageType" resultMap="messageTypeMap"></association>
+	</resultMap>
+
+	<resultMap type="User" id="userMap" autoMapping="true">
+		<id property="id" column="user_id" />
+	</resultMap>
+	<resultMap type="MessageType" id="messageTypeMap" autoMapping="true">
+		<id property="id" column="messageType_id" />
+	</resultMap>
+	
+	
+	<insert id="add" parameterType="Message">
+	insert into t_message  ( title, content, messageType_id,  user_id,  record_time) 
+	values(#{title},#{content},#{messageType.id},#{user.id},#{record_time})
+	</insert>
+	
+	<update id="update" parameterType="Message">
+	update t_message set title=#{title},messageType_id=#{messageType.id} where id =#{id}
+
+	</update>
+	
+		<update id="edit" parameterType="Message">
+	update t_message set title=#{title} where id =#{id}
+
+	</update>
+	
+	<delete id="delete"  parameterType="int">
+	delete from t_message where id = #{id}
+	</delete>
+	
+	<select id="listMessageTypes"  resultType="MessageType">
+			select * from t_messagetype;
+	</select>
+</mapper>
